@@ -59,7 +59,7 @@ func (info *bencodeInfo) splitPiecesHashes() ([][20]byte, error) {
 		return nil, err
 	}
 	numHashes := len(buffer) / hashLen
-	hashes := make([][20]byte, numHashes)
+	hashes := make([][20]byte, 0, numHashes)
 
 	for i := 0; i < numHashes; i++ {
 		var hashArr [20]byte
@@ -72,7 +72,7 @@ func (info *bencodeInfo) splitPiecesHashes() ([][20]byte, error) {
 // hash calculates the checksum of the bencodeInfo struct
 func (info *bencodeInfo) hash() ([20]byte, error) {
 	var buffer bytes.Buffer
-	err := bencode.Marshal(&buffer, info)
+	err := bencode.Marshal(&buffer, *info)
 	if err != nil {
 		return [20]byte{}, err
 	}
