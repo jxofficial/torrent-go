@@ -23,4 +23,3 @@ func (t *TorrentFile) buildTrackerURL(peerID [20]byte, port uint16) (string, err
 	// String is a method on the *URL receiver
 	return base.String(), nil
 }
-
