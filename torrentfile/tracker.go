@@ -1,6 +1,7 @@
 package torrentfile
 
 import (
+	"github.com/jxofficial/torrent-go/peers"
 	"net/url"
 	"strconv"
 )
@@ -22,4 +23,8 @@ func (t *TorrentFile) buildTrackerURL(peerID [20]byte, port uint16) (string, err
 	base.RawQuery = params.Encode()
 	// String is a method on the *URL receiver
 	return base.String(), nil
+}
+
+func (t *TorrentFile) requestPeers(peerID [20]byte, port uint16) ([]peers.Peer, error) {
+	return nil, nil
 }
