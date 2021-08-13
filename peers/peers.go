@@ -12,10 +12,11 @@ type Peer struct {
 	Port uint16
 }
 
+// Unmarshal converts a binary blob of peers into Peers of 6 bytes each
 func Unmarshal(peersBinary []byte) ([]Peer, error) {
 	const peerBytes = 6
 	if len(peersBinary) % peerBytes != 0 {
-		err := fmt.Errorf("Received malformed peers")
+		err := fmt.Errorf("received malformed peers")
 		return nil, err
 	}
 

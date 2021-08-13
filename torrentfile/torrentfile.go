@@ -10,8 +10,8 @@ import (
 
 type bencodeInfo struct {
 	Pieces      string `bencode:"pieces"` // binary blob of the hashes of each piece
-	PieceLength int    `bencode:"piece length"`
-	Length      int    `bencode:"length"`
+	PieceLength int    `bencode:"piece length"` // each piece is of the same piece length
+	Length      int    `bencode:"length"` // length of the torrent
 	Name        string `bencode:"name"`
 }
 
@@ -23,6 +23,7 @@ type bencodeTorrent struct {
 // TorrentFile is an application layer struct
 type TorrentFile struct {
 	Announce    string
+	// InfoHash uniquely identifies files when communicating with trackers and peers
 	InfoHash    [20]byte   // hash of bencode info - including pieces, length, name, piece length
 	PieceHashes [][20]byte // slice of 20byte arrays
 	PieceLength int
