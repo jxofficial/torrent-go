@@ -36,7 +36,7 @@ type Message struct {
 }
 
 // Serialize serializes a message struct into a buffer of the form
-// <ID+payload length><messageID><payload>
+// <ID length+payload length><messageID><payload>
 func (m *Message) Serialize() []byte {
 	if m == nil {
 		return make([]byte, 4) // message length is 0
@@ -53,7 +53,7 @@ func (m *Message) Serialize() []byte {
 // Read parses a message from a stream. Returns nil on keep-alive message
 func Read(r io.Reader) (*Message, error) {
 	lenBuf := make([]byte, 4)
-	// r.read(buf) reads up to len(buf) bytes **FROM r** into buf
+	// r.read(buf) reads up to len(buf) bytes from r into buf
 	_, err := io.ReadFull(r, lenBuf)
 	if err != nil {
 		return nil, err
@@ -77,7 +77,6 @@ func Read(r io.Reader) (*Message, error) {
 	}
 	return m, nil
 }
-
 
 func (m *Message) name() string {
 	if m == nil {

@@ -99,4 +99,3 @@ func (bto bencodeTorrent) toTorrentFile() (TorrentFile, error) {
 	}
 	return t, nil
 }
-

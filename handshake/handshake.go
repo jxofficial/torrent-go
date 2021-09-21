@@ -27,12 +27,13 @@ func (h *Handshake) Serialize() []byte {
 	buf[0] = byte(len(h.Pstr))
 	curr := 1
 	curr += copy(buf[curr:], h.Pstr)
-	curr += copy(buf[curr:], make([]byte, 8))
+	curr += copy(buf[curr:], make([]byte, 8)) // 8 reserved bytes
 	curr += copy(buf[curr:], h.InfoHash[:])
 	curr += copy(buf[curr:], h.PeerID[:])
 	return buf
 }
 
+// Read parses a handshake from a stream
 func Read(r io.Reader) (*Handshake, error) {
 	// remove the first byte which is the pstr length
 	bufLen := make([]byte, 1)
@@ -56,7 +57,7 @@ func Read(r io.Reader) (*Handshake, error) {
 	}
 
 	var infoHash, peerID [20]byte
-	copy(infoHash[:], handshakeBuf[pstrLen+8:pstrLen+28])
+	copy(infoHash[:], handshakeBuf[pstrLen+8:pstrLen+28]) // 8 reserved bytes after the pstr
 	copy(peerID[:], handshakeBuf[pstrLen+28:])
 
 	h := &Handshake{
