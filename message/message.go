@@ -8,7 +8,6 @@ import (
 
 type messageID uint8
 
-
 const (
 	// MsgChoke chokes the receiver
 	MsgChoke messageID = 0
@@ -35,13 +34,29 @@ type Message struct {
 	Payload []byte
 }
 
+// FormatRequest creates a REQUEST message
+func FormatRequest(index, begin, length int) *Message {
+	payload := make([]byte, 12)
+	binary.BigEndian.PutUint32(payload[0:4], uint32(index))
+	binary.BigEndian.PutUint32(payload[4:8], uint32(begin))
+	binary.BigEndian.PutUint32(payload[8:12], uint32(length))
+	return &Message{ID: MsgRequest, Payload: payload}
+}
+
+// FormatHave creates a HAVE message
+func FormatHave(index int) *Message {
+	payload := make([]byte, 4)
+	binary.BigEndian.PutUint32(payload, uint32(index))
+	return &Message{ID: MsgHave, Payload: payload}
+}
+
 // Serialize serializes a message struct into a buffer of the form
 // <ID length+payload length><messageID><payload>
 func (m *Message) Serialize() []byte {
 	if m == nil {
 		return make([]byte, 4) // message length is 0
 	}
-	len := uint32(len(m.Payload)+1) // message + id
+	len := uint32(len(m.Payload)+1) // length of message + length of id
 
 	buf := make([]byte, 4+len)
 	binary.BigEndian.PutUint32(buf[0:4], len)

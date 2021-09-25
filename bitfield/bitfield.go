@@ -1,5 +1,7 @@
 package bitfield
 
+// Bitfield is used by peers to indicate which pieces
+// they are able to send.
 type Bitfield []byte
 
 // HasPiece returns whether a bitfield has a particular index set to 1

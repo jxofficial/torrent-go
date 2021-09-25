@@ -1,6 +1,7 @@
 package p2p
 
 import (
+	"github.com/jxofficial/torrent-go/client"
 	"github.com/jxofficial/torrent-go/peers"
 	"log"
 )
@@ -48,9 +49,15 @@ func (t *Torrent) calculatePieceSize(index int) int {
 
 func (t *Torrent) startDownloadWorker(
 	peer peers.Peer, workQueue chan *pieceWork, results chan *pieceResult) {
-	// c, err := client.New(peer, t.PeerID, t.InfoHash)
-}
+	c, err := client.New(peer, t.PeerID, t.InfoHash)
+	if err != nil {
+		log.Printf("Could not perform handshake with %s. Disconnecting.\n", peer.IP)
+	}
+	defer c.Conn.Close()
+	log.Printf("Completed handshake with %s\n", peer.IP)
 
+
+}
 
 func (t *Torrent) Download() ([]byte, error) {
 	log.Println("Starting download for", t.Name)
@@ -66,9 +73,25 @@ func (t *Torrent) Download() ([]byte, error) {
 	}
 
 	for _, peer := range t.Peers {
-		// start a goroutine for each peer
+		// start a goroutine for each peer (worker)
 		go t.startDownloadWorker(peer, workQueue, results)
 	}
 
-	return make([]byte, 0), nil
+	buf := make([]byte, t.Length)
+	donePieces := 0
+	// while there are still pieces left to process
+	// continue reading from the results channel
+	for donePieces < len(t.PieceHashes) {
+		res := <-results
+		// find byte at which piece starts
+		begin, end := t.calculateBoundsForPiece(res.index)
+		copy(buf[begin:end], res.buf)
+		donePieces++
+
+		percent := float64(donePieces) / float64(len(t.PieceHashes)) * 100
+		log.Printf("(%0.2f%%) Downloaded. Piece %d", percent, res.index)
+	}
+
+	close(workQueue)
+	return buf, nil
 }
